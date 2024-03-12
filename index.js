@@ -4,6 +4,7 @@ const connectDB = require('./config/db')
 const port = process.env.PORT || 3000
 const cors = require('cors')
 const users = require('./routes/userRoutes')
+const { errorHandler } = require('./middleware/errorHandler')
 
 connectDB()
 
@@ -13,6 +14,8 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.use('/api/users', users)
+
+app.use(errorHandler)
 
 app.use((req, res) => {
   res.status(404).send('Not Found')
