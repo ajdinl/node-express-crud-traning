@@ -1,103 +1,83 @@
 const asyncHandler = require('express-async-handler')
-const Post = require('../models/postModel')
-const User = require('../models/userModel')
+const {
+  getSqlPosts,
+  getSqlPost,
+  createSqlPost,
+  updateSqlPost,
+  deleteSqlPost,
+  getNoSqlPosts,
+  getNoSqlPost,
+  createNoSqlPost,
+  updateNoSqlPost,
+  deleteNoSqlPost,
+} = require('../services/postServices')
 
 // @desc    Get posts
 // @route   GET /api/posts
 // @access  Private
 const getPosts = asyncHandler(async (req, res) => {
-  const posts = await Post.find({ user: req.user.id })
-
-  res.status(200).json(posts)
+  // Check if SQL
+  if (process.env.DATABASE_SQL === 'true') {
+    getSqlPosts(req, res)
+  } else {
+    getNoSqlPosts(req, res)
+  }
 })
 
 const getPost = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.id)
-
-  if (!post) {
-    res.status(400)
-    throw new Error('Post not found')
+  // Check if SQL
+  if (process.env.DATABASE_SQL === 'true') {
+    getSqlPost(req, res)
+  } else {
+    getNoSqlPost(req, res)
   }
-
-  res.status(200).json(post)
 })
 
 // @desc    Create post
 // @route   POST /api/posts
 // @access  Private
 const createPost = asyncHandler(async (req, res) => {
-  const { title, description } = req.body
+  const { id, title, description } = req.body
 
   if (!title || !description) {
     res.status(400)
     throw new Error('Please add a title and description')
   }
 
-  const post = await Post.create({
-    title,
-    description,
-    user: req.user.id,
-  })
+  if (process.env.DATABASE_SQL === 'true') {
+    if (!id) {
+      res.status(400)
+      throw new Error('Please add an id')
+    }
 
-  res.status(200).json(post)
+    createSqlPost(req, res, id, title, description)
+  } else {
+    createNoSqlPost(req, res, title, description)
+  }
 })
 
 // @desc    Update post
 // @route   PUT /api/posts/:id
 // @access  Private
 const updatePost = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.id)
-
-  if (!post) {
-    res.status(400)
-    throw new Error('Post not found')
+  const { id, title, description } = req.body
+  if (process.env.DATABASE_SQL === 'true') {
+    updateSqlPost(req, res, id, title, description)
+  } else {
+    updateNoSqlPost(req, res)
   }
-
-  // Check for user
-  if (!req.user) {
-    res.status(401)
-    throw new Error('User not found')
-  }
-
-  // Make sure the logged in user matches the post user
-  if (post.user.toString() !== req.user.id) {
-    res.status(401)
-    throw new Error('User not authorized')
-  }
-
-  const updatedPost = await Post.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-  })
-
-  res.status(200).json(updatedPost)
 })
 
 // @desc    Delete post
 // @route   DELETE /api/posts/:id
 // @access  Private
 const deletePost = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.id)
-
-  if (!post) {
-    res.status(400)
-    throw new Error('Post not found')
+  // Check if SQL
+  if (process.env.DATABASE_SQL === 'true') {
+    deleteSqlPost(req, res)
+  } else {
+    deleteNoSqlPost(req, res)
   }
-
-  // Check for user
-  if (!req.user) {
-    res.status(401)
-    throw new Error('User not found')
-  }
-
-  // Make sure the logged in user matches the post user
-  if (post.user.toString() !== req.user.id) {
-    res.status(401)
-    throw new Error('User not authorized')
-  }
-
-  await post.findByIdAndDelete(req.params.id)
-
-  res.status(200).json({ id: req.params.id })
 })
 
 module.exports = {
