@@ -1,4 +1,9 @@
 const mongoose = require('mongoose')
+const { Pool } = require('pg')
+
+const pool = new Pool({
+  connectionString: process.env.POSTGRES_URL,
+})
 
 const connectDB = async () => {
   try {
@@ -11,4 +16,4 @@ const connectDB = async () => {
   }
 }
 
-module.exports = connectDB
+module.exports = { pool, connectDB }
