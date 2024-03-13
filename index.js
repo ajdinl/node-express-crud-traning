@@ -19,31 +19,6 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.get('/', async (req, res) => {
-  try {
-    const posts = await pool.query('SELECT * FROM posts')
-    res.json(posts.rows)
-  } catch (err) {
-    console.error(err.message)
-    res.status(500).send('Server Error')
-  }
-})
-
-app.post('/', async (req, res) => {
-  try {
-    const { id, title, description } = req.body
-    const newPost = await pool.query(
-      'INSERT INTO posts (id, title, description) VALUES ($1, $2, $3) RETURNING *',
-      [id, title, description]
-    )
-
-    res.json(newPost.rows[0])
-  } catch (err) {
-    console.error(err.message)
-    res.status(500).send('Server Error')
-  }
-})
-
 app.use('/api/users', users)
 app.use('/api/posts', posts)
 
