@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const connectDB = require('./config/db')
+const { pool, connectDB } = require('./config/db')
 const port = process.env.PORT || 3000
 const cors = require('cors')
 const users = require('./routes/userRoutes')
@@ -8,6 +8,11 @@ const posts = require('./routes/postRoutes')
 const { errorHandler } = require('./middleware/errorHandler')
 
 connectDB()
+
+pool.connect((err) => {
+  if (err) console.error('connection error', err.stack)
+  console.log('Postgres connected')
+})
 
 app.use(cors())
 
