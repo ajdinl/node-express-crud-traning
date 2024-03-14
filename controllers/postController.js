@@ -37,10 +37,10 @@ const getPost = asyncHandler(async (req, res) => {
 // @route   POST /api/posts
 // @access  Private
 const createPost = asyncHandler(async (req, res) => {
-  const { id, title, description } = req.body
+  const { title, description } = req.body
 
   if (!title || !description) {
-    res.status(400).json({ message: 'Please add a title and description' })
+    res.status(400).send('Title and description are required')
     return
   }
 
