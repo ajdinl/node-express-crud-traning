@@ -7,6 +7,10 @@ const {
 } = require('../controllers/userController')
 const { protect } = require('../middleware/authMiddleware')
 
+router.post('/', registerUser)
+router.post('/login', loginUser)
+router.get('/profile', protect, getProfile)
+
 /**
  * @swagger
  * tags:
@@ -114,8 +118,5 @@ const { protect } = require('../middleware/authMiddleware')
  *         '401':
  *           $ref: '#/components/responses/UnauthorizedError'
  */
-router.post('/', registerUser)
-router.post('/login', loginUser)
-router.get('/profile', protect, getProfile)
 
 module.exports = router
