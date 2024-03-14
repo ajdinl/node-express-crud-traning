@@ -40,19 +40,14 @@ const createPost = asyncHandler(async (req, res) => {
   const { id, title, description } = req.body
 
   if (!title || !description) {
-    res.status(400)
-    throw new Error('Please add a title and description')
+    res.status(400).json({ message: 'Please add a title and description' })
+    return
   }
 
   if (process.env.DATABASE_SQL === 'true') {
-    if (!id) {
-      res.status(400)
-      throw new Error('Please add an id')
-    }
-
-    createSqlPost(req, res, id, title, description)
+    createSqlPost(req, res)
   } else {
-    createNoSqlPost(req, res, title, description)
+    createNoSqlPost(req, res)
   }
 })
 
@@ -60,9 +55,8 @@ const createPost = asyncHandler(async (req, res) => {
 // @route   PUT /api/posts/:id
 // @access  Private
 const updatePost = asyncHandler(async (req, res) => {
-  const { id, title, description } = req.body
   if (process.env.DATABASE_SQL === 'true') {
-    updateSqlPost(req, res, id, title, description)
+    updateSqlPost(req, res)
   } else {
     updateNoSqlPost(req, res)
   }
