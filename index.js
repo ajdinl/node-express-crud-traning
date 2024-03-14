@@ -1,11 +1,18 @@
 const express = require('express')
-const app = express()
-const { pool, connectDB } = require('./config/db')
-const port = process.env.PORT || 3000
-const cors = require('cors')
-const users = require('./routes/userRoutes')
-const posts = require('./routes/postRoutes')
+app = express()
+cors = require('cors')
+port = process.env.PORT || 3000
+users = require('./routes/userRoutes')
+posts = require('./routes/postRoutes')
+swaggerJsdoc = require('swagger-jsdoc')
+swaggerUi = require('swagger-ui-express')
+options = require('./config/swaggerOptions')
 const { errorHandler } = require('./middleware/errorHandler')
+const { pool, connectDB } = require('./config/db')
+
+const specs = swaggerJsdoc(options)
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs))
 
 connectDB()
 

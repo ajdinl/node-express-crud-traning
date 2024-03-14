@@ -9,12 +9,181 @@ const {
 } = require('../controllers/postController')
 const { protect } = require('../middleware/authMiddleware')
 
-router.route('/').get(protect, getPosts).post(protect, createPost)
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Post:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The auto-generated id of the post
+ *         title:
+ *           type: string
+ *           description: The title of the post
+ *         description:
+ *           type: string
+ *           description: The description of the post
+ *         user:
+ *           type: string
+ *           description: The user id
+ *       required:
+ *         - title
+ *         - description
+ *         - user
+ *       example:
+ *         id: 1
+ *         title: The title of the post
+ *         description: The description of the post
+ *         user: 65f05ff22571edc55e9e88f5
+ *   responses:
+ *     UnauthorizedError:
+ *       description: Unauthorized access error
+ */
 
-router
-  .route('/:id')
-  .get(protect, getPost)
-  .put(protect, updatePost)
-  .delete(protect, deletePost)
+/**
+ * @swagger
+ * tags:
+ *   name: Posts
+ *   description: APIs for managing posts
+ */
+
+/**
+ * @swagger
+ * /api/posts:
+ *   get:
+ *     summary: Retrieve all posts
+ *     tags: [Posts]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: A list of posts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Post'
+ *       '401':
+ *         $ref: '#/components/responses/UnauthorizedError'
+ */
+router.get('/', protect, getPosts)
+
+/**
+ * @swagger
+ * /api/posts:
+ *   post:
+ *     summary: Create a new post
+ *     tags: [Posts]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Post'
+ *     responses:
+ *       '200':
+ *         description: The created post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Post'
+ *       '401':
+ *         $ref: '#/components/responses/UnauthorizedError'
+ */
+router.post('/', protect, createPost)
+
+/**
+ * @swagger
+ * /api/posts/{id}:
+ *   get:
+ *     summary: Retrieve a single post by ID
+ *     tags: [Posts]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the post to retrieve
+ *     responses:
+ *       '200':
+ *         description: A single post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Post'
+ *       '401':
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       '404':
+ *         description: Post not found
+ */
+router.get('/:id', protect, getPost)
+
+/**
+ * @swagger
+ * /api/posts/{id}:
+ *   put:
+ *     summary: Update a post by ID
+ *     tags: [Posts]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the post to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Post'
+ *     responses:
+ *       '200':
+ *         description: The updated post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Post'
+ *       '401':
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       '404':
+ *         description: Post not found
+ */
+router.put('/:id', protect, updatePost)
+
+/**
+ * @swagger
+ * /api/posts/{id}:
+ *   delete:
+ *     summary: Delete a post by ID
+ *     tags: [Posts]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the post to delete
+ *     responses:
+ *       '204':
+ *         description: Post deleted successfully
+ *       '401':
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       '404':
+ *         description: Post not found
+ */
+router.delete('/:id', protect, deletePost)
 
 module.exports = router
