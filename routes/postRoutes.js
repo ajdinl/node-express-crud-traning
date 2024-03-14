@@ -9,6 +9,13 @@ const {
 } = require('../controllers/postController')
 const { protect } = require('../middleware/authMiddleware')
 
+router.get('/', protect, getPosts).post('/', protect, createPost)
+
+router
+  .get('/:id', protect, getPost)
+  .put('/:id', protect, updatePost)
+  .delete('/:id', protect, deletePost)
+
 /**
  * @swagger
  * components:
@@ -41,14 +48,12 @@ const { protect } = require('../middleware/authMiddleware')
  *     UnauthorizedError:
  *       description: Unauthorized access error
  */
-
 /**
  * @swagger
  * tags:
  *   name: Posts
  *   description: APIs for managing posts
  */
-
 /**
  * @swagger
  * /api/posts:
@@ -68,9 +73,9 @@ const { protect } = require('../middleware/authMiddleware')
  *                 $ref: '#/components/schemas/Post'
  *       '401':
  *         $ref: '#/components/responses/UnauthorizedError'
+ *       '404':
+ *         $ref: '#/components/responses/NotFound'
  */
-router.get('/', protect, getPosts)
-
 /**
  * @swagger
  * /api/posts:
@@ -92,11 +97,11 @@ router.get('/', protect, getPosts)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Post'
+ *       '400':
+ *         description: Bad request
  *       '401':
  *         $ref: '#/components/responses/UnauthorizedError'
  */
-router.post('/', protect, createPost)
-
 /**
  * @swagger
  * /api/posts/{id}:
@@ -124,8 +129,6 @@ router.post('/', protect, createPost)
  *       '404':
  *         description: Post not found
  */
-router.get('/:id', protect, getPost)
-
 /**
  * @swagger
  * /api/posts/{id}:
@@ -159,8 +162,6 @@ router.get('/:id', protect, getPost)
  *       '404':
  *         description: Post not found
  */
-router.put('/:id', protect, updatePost)
-
 /**
  * @swagger
  * /api/posts/{id}:
@@ -184,6 +185,5 @@ router.put('/:id', protect, updatePost)
  *       '404':
  *         description: Post not found
  */
-router.delete('/:id', protect, deletePost)
 
 module.exports = router
