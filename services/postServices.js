@@ -50,20 +50,25 @@ const createNoSqlPost = async (req, res) => {
 }
 
 const updateSqlPost = async (req, res) => {
-  const { id, title, description } = req.body
+  const { title, description } = req.body
+  const { rows } = await pool.query('SELECT * FROM posts WHERE id = $1', [
+    req.params.id,
+  ])
+  if (!rows[0]) return res.status(404).send('Post not found')
+  if (rows[0].user !== req.user.id)
+    return res.status(401).json({ message: 'User not authorized' })
   await pool.query(
     'UPDATE posts SET title = $1, description = $2 WHERE id = $3',
-    [title, description, id]
+    [title, description, req.params.id]
   )
-  res.status(200).json({ id, title, description })
+  res.status(200).json({ id: req.params.id, title, description })
 }
 
 const updateNoSqlPost = async (req, res) => {
   const post = await Post.findById(req.params.id)
-  if (!post) return res.status(404).json({ msg: 'Post not found' })
-  if (!req.user) return res.status(401).json({ msg: 'Unauthorized' })
+  if (!post) return res.status(404).json({ message: 'Post not found' })
   if (post.user.toString() !== req.user.id)
-    return res.status(401).json({ msg: 'Unauthorized' })
+    return res.status(401).json({ message: 'User not authorized' })
 
   const updatedPost = await Post.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -75,7 +80,6 @@ const deleteSqlPost = async (req, res) => {
   const { id } = req.params
   const { rows } = await pool.query('SELECT * FROM posts WHERE id = $1', [id])
   if (!rows[0]) return res.status(404).send('Post not found')
-  if (!req.user) return res.status(401).send('User not found')
   if (rows[0].user !== req.user.id)
     return res.status(401).send('User not authorized')
 
@@ -85,10 +89,9 @@ const deleteSqlPost = async (req, res) => {
 
 const deleteNoSqlPost = async (req, res) => {
   const post = await Post.findById(req.params.id)
-  if (!post) return res.status(404).json({ msg: 'Post not found' })
-  if (!req.user) return res.status(401).json({ msg: 'User not found' })
+  if (!post) return res.status(404).json({ message: 'Post not found' })
   if (post.user.toString() !== req.user.id)
-    return res.status(401).json({ msg: 'User not authorized' })
+    return res.status(401).json({ message: 'User not authorized' })
 
   await Post.findByIdAndDelete(req.params.id)
   res.status(204).json({ id: req.params.id })

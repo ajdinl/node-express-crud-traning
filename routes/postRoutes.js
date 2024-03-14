@@ -68,6 +68,8 @@ const { protect } = require('../middleware/authMiddleware')
  *                 $ref: '#/components/schemas/Post'
  *       '401':
  *         $ref: '#/components/responses/UnauthorizedError'
+ *       '404':
+ *         $ref: '#/components/responses/NotFound'
  */
 router.get('/', protect, getPosts)
 
@@ -92,6 +94,8 @@ router.get('/', protect, getPosts)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Post'
+ *       '400':
+ *         description: Bad request
  *       '401':
  *         $ref: '#/components/responses/UnauthorizedError'
  */

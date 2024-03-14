@@ -38,12 +38,10 @@ const getPost = asyncHandler(async (req, res) => {
 // @access  Private
 const createPost = asyncHandler(async (req, res) => {
   const { title, description } = req.body
-
   if (!title || !description) {
     res.status(400).send('Title and description are required')
     return
   }
-
   if (process.env.DATABASE_SQL === 'true') {
     createSqlPost(req, res)
   } else {
